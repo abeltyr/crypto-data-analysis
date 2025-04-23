@@ -7,20 +7,36 @@ import (
 )
 
 func main() {
-	// --- Configuration ---
-	symbol := "ETHUSDT"
-	interval := "1h" // 1 hour interval
-	// Define the date range (inclusive)
-	// Example: Fetch data from 2017-01-01 to 2017-12-31
-	startDateStr := "2017-01-01"
-	endDateStr := "2017-12-31"
-	outputDir := "./data/eth"
-	outputFileName := "2017.json"
 
-	// Call the function to fetch and save data
-	err := utils.FetchAndSaveKlines(symbol, interval, startDateStr, endDateStr, outputDir, outputFileName)
+	fmt.Println("\n--- Starting DCA Simulation ---")
+	jsonInputPath := "./data/btc/merged_eth_data.json" // Use the merged data
+	// "01", "08" "22" "31"
+	simStartDate := "2017-01-01"
+	simEndDate := "2023-12-31"
+
+	investmentAmount := 13.0 // Invest $100 each interval
+	dailyReportOutputPath := "./reports/sum/year/7/2017/dca_report_daily.txt"
+	err := utils.SimulateDCA(jsonInputPath, simStartDate, simEndDate, utils.Daily, investmentAmount, dailyReportOutputPath)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1) // Exit with a non-zero code to indicate failure
+		fmt.Printf("Error running DCA simulation: %v\n", err)
+		os.Exit(1)
 	}
+
+	weeklyInvestmentAmount := 92.3 // Invest $100 each interval
+	weeklyReportOutputPath := "./reports/sum/year/7/2017/dca_report_weekly.txt"
+	err = utils.SimulateDCA(jsonInputPath, simStartDate, simEndDate, utils.Weekly, weeklyInvestmentAmount, weeklyReportOutputPath)
+	if err != nil {
+		fmt.Printf("Error running DCA simulation: %v\n", err)
+		os.Exit(1)
+	}
+
+	monthlyInvestmentAmount := 400.0 // Invest $100 each interval
+	monthlyReportOutputPath := "./reports/sum/year/7/2017/dca_report_monthly.txt"
+	errs := utils.SimulateDCA(jsonInputPath, simStartDate, simEndDate, utils.Monthly, monthlyInvestmentAmount, monthlyReportOutputPath)
+	if errs != nil {
+		fmt.Printf("errsor running DCA simulation: %v\n", errs)
+		os.Exit(1)
+	}
+
+	fmt.Println("\n--- All Processes Completed Successfully ---")
 }
